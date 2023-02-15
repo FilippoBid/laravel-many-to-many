@@ -41,6 +41,12 @@
       <input type="text" class="form-control" name="github_link" value="{{$project->github_link}}" >
     </div>
 
+    <select name="type_id" class="form-select mb-4">
+      @foreach ($types as $type)
+      <option value="{{ $type->id }}">{{ $type->type }}</option>
+      @endforeach
+    </select>
+
     
     
 

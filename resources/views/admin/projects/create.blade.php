@@ -39,6 +39,22 @@
       <label class="form-label">Github link</label>
       <input type="text" class="form-control" name="github_link" value="{{old('github_link')}}" >
     </div>
+    
+
+    <label class="form-label">type</label>
+    <select name="type_id" class="form-select mb-4">
+        @foreach ($types as $type)
+        <option value="{{ $type->id }}">{{ $type->type }}</option>
+        @endforeach
+    </select>
+
+    <label class="form-label">Technologies</label>
+       <select class="form-select @error('technology_id') is-invalid @enderror" name="technology_id">
+           @foreach ($technologies as $technology)
+               <option value="{{ $technology->id }}">{{ $technology->technology }}</option>
+           @endforeach
+       </select>
+      
 
     
     

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Project extends Model
 {
     protected $fillable=[
-        "name","description","cover_img","github_link"
+        "name","description","cover_img","github_link","type_id","technology_id"
         
     ];
     

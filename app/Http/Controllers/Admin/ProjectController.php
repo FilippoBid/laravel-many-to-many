@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Admin\Project;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Admin\Technology;
+use App\Models\Admin\Type;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use PhpParser\Node\Stmt\If_;
@@ -23,8 +25,14 @@ class ProjectController extends Controller
     {
         $projects= Project::all();
 
+        $types = Type::all();
+        $technologies = Technology::all();
+
+
         return view("admin.projects.index", [
-            "projects" => $projects    
+            "projects" => $projects,    
+            "types" => $types,
+            "technologies" => $technologies 
         ]);
     }
 
@@ -35,7 +43,10 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        return view("admin.projects.create");
+        $types = Type::all();
+        $technologies = Technology::all();
+ 
+        return view("admin.projects.create", compact("types","technologies"));
     }
 
     /**
@@ -50,7 +61,9 @@ class ProjectController extends Controller
         "name" => "required|string|max:20",
         "description" => "required|string",
         "cover_img" => "file",
-        "github_link" => "string"
+        "github_link" => "string",
+        "type_id" => "nullable|exists:types,id",
+        "technology_id "=>"nullable|exists:technologies,id"
         ]);
 
 
@@ -83,7 +96,9 @@ class ProjectController extends Controller
     public function show($id)
     {
         $project = Project::findOrFail($id);
-        return view("admin.projects.show", compact("project"));
+        $types = Type::all();
+  
+        return view("admin.projects.show", compact("project","types"));
     }
 
     /**
@@ -94,8 +109,10 @@ class ProjectController extends Controller
      */
     public function edit($id)
     {
+        $types = Type::all();
+
         $project = Project::findOrFail($id);
-        return view("admin.projects.edit",compact("project"));
+        return view("admin.projects.edit",compact("project","types"));
     }
 
     /**
@@ -112,7 +129,8 @@ class ProjectController extends Controller
             "name" => "required|string|max:20",
             "description" => "required|string",
             "cover_img" => "file",
-            "github_link" => "string"
+            "github_link" => "string",
+            "type_id" => "nullable|exists:types,id"
             ]);
 
 

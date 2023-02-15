@@ -15,8 +15,10 @@
       <div class="card-title"><strong>Name:</strong>{{ $project->name }}</div>
       <p class="card-text"><strong>Description:</strong>{{ $project->description }}</p>
       <p class="card-text"><strong>link git:</strong>{{ $project->github_link }}</p>
+      <p class="card-text"><strong>Type:</strong>{{ $project->type_id ? $project->type_id : '' }}</p>
       <a class="btn btn-info my-3" href="{{ route('admin.projects.index')}}">torna alla pagina dei progetti</a>
     </div>
+    @dump($project)
 
     
   </div>
