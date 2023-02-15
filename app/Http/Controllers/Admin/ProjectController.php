@@ -63,9 +63,9 @@ class ProjectController extends Controller
         "cover_img" => "file",
         "github_link" => "string",
         "type_id" => "nullable|exists:types,id",
-        "technology_id "=>"nullable|exists:technologies,id"
+        "technology_id"=>"array|nullable|exists:technologies,id"
         ]);
-
+        
 
         if (key_exists("cover_img", $data)){
 
@@ -79,7 +79,15 @@ class ProjectController extends Controller
         // recuperiamo l'id dagli user cioé user_id é uguale all'utente loggato
         "user_id" => Auth::id() 
         ]);
-
+           /*  dd($data); */
+        /* prende i dati e vede se esistono quei valori nella tabella technlologies  */
+        /* la funzione technologie è quella del model technology */
+        if ($request->has("technology_id")) {
+            /* oppure posso usare */
+            // if (key_exists("tags", $data)) {
+            $project->technologies()->attach($data["technology_id"]);
+        }
+        /* dd($data); */
         return redirect()->route("admin.projects.show", compact("project"));
 
        
@@ -96,9 +104,9 @@ class ProjectController extends Controller
     public function show($id)
     {
         $project = Project::findOrFail($id);
-        $types = Type::all();
+      
   
-        return view("admin.projects.show", compact("project","types"));
+        return view("admin.projects.show", compact("project"));
     }
 
     /**
@@ -109,10 +117,11 @@ class ProjectController extends Controller
      */
     public function edit($id)
     {
-        $types = Type::all();
+        $type = Type::all();
+        $technologies = Technology::all();
 
         $project = Project::findOrFail($id);
-        return view("admin.projects.edit",compact("project","types"));
+        return view("admin.projects.edit",compact("project","type","technologies"));
     }
 
     /**
@@ -130,7 +139,8 @@ class ProjectController extends Controller
             "description" => "required|string",
             "cover_img" => "file",
             "github_link" => "string",
-            "type_id" => "nullable|exists:types,id"
+            "type_id" => "nullable|exists:types,id",
+            "technology_id "=>"nullable|exists:technologies,id"
             ]);
 
 
@@ -151,7 +161,8 @@ class ProjectController extends Controller
             "user_id" =>Auth::id(),
             "cover_img"=>$path ?? $project->cover_img,
 
-        ]);   
+        ]);  
+        $project->technologies()->sync($data["technology_id"]); 
 
 
         return redirect()->route("admin.projects.show",$id);

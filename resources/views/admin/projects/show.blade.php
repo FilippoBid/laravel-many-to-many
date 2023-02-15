@@ -16,9 +16,14 @@
       <p class="card-text"><strong>Description:</strong>{{ $project->description }}</p>
       <p class="card-text"><strong>link git:</strong>{{ $project->github_link }}</p>
       <p class="card-text"><strong>Type:</strong>{{ $project->type_id ? $project->type_id : '' }}</p>
+      <p class="card-text"><strong>TECHNOLOGIES:</strong>
+   {{--      @dd($project->technologies); --}}
+          {{$project->technologies->implode('technology', ' ')}}
+ 
+      </p>
       <a class="btn btn-info my-3" href="{{ route('admin.projects.index')}}">torna alla pagina dei progetti</a>
     </div>
-    @dump($project)
+    {{-- @dump($project->technology_id) --}}
 
     
   </div>
