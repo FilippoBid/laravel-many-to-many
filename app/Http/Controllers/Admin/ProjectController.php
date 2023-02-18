@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use PhpParser\Node\Stmt\If_;
 
+use function PHPUnit\Framework\isNull;
 
 class ProjectController extends Controller
 {
@@ -23,16 +24,16 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects= Project::all();
+        $projects = Project::all();
 
         $types = Type::all();
         $technologies = Technology::all();
 
 
         return view("admin.projects.index", [
-            "projects" => $projects,    
+            "projects" => $projects,
             "types" => $types,
-            "technologies" => $technologies 
+            "technologies" => $technologies
         ]);
     }
 
@@ -45,8 +46,8 @@ class ProjectController extends Controller
     {
         $types = Type::all();
         $technologies = Technology::all();
- 
-        return view("admin.projects.create", compact("types","technologies"));
+
+        return view("admin.projects.create", compact("types", "technologies"));
     }
 
     /**
@@ -57,29 +58,29 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-       $data = $request->validate([
-        "name" => "required|string|max:20",
-        "description" => "required|string",
-        "cover_img" => "file",
-        "github_link" => "string",
-        "type_id" => "nullable|exists:types,id",
-        "technology_id"=>"array|nullable|exists:technologies,id"
+        $data = $request->validate([
+            "name" => "required|string|max:20",
+            "description" => "required|string",
+            "cover_img" => "file",
+            "github_link" => "string",
+            "type_id" => "nullable|exists:types,id",
+            "technology_id" => "array|nullable|exists:technologies,id"
         ]);
-        
 
-        if (key_exists("cover_img", $data)){
+
+        if (key_exists("cover_img", $data)) {
 
             $path = Storage::put("projects", $data["cover_img"]);
         }
- 
-       $project = Project::create([
-        ...$data,
-        //a bd vado a salvare solamente il percorso 
-        "cover_img" => $path ?? '',
-        // recuperiamo l'id dagli user cioé user_id é uguale all'utente loggato
-        "user_id" => Auth::id() 
+
+        $project = Project::create([
+            ...$data,
+            //a bd vado a salvare solamente il percorso 
+            "cover_img" => $path ?? '',
+            // recuperiamo l'id dagli user cioé user_id é uguale all'utente loggato
+            "user_id" => Auth::id()
         ]);
-           /*  dd($data); */
+        /*  dd($data); */
         /* prende i dati e vede se esistono quei valori nella tabella technlologies  */
         /* la funzione technologie è quella del model technology */
         if ($request->has("technology_id")) {
@@ -89,11 +90,9 @@ class ProjectController extends Controller
         }
         /* dd($data); */
         return redirect()->route("admin.projects.show", compact("project"));
-
-       
     }
-       
-   
+
+
 
     /**
      * Display the specified resource.
@@ -104,9 +103,9 @@ class ProjectController extends Controller
     public function show($id)
     {
         $project = Project::findOrFail($id);
-      
-  
-        return view("admin.projects.show", compact("project"));
+
+       /*  dd($project); */
+        return view("admin.projects.show", ["project" => $project]);
     }
 
     /**
@@ -121,7 +120,7 @@ class ProjectController extends Controller
         $technologies = Technology::all();
 
         $project = Project::findOrFail($id);
-        return view("admin.projects.edit",compact("project","type","technologies"));
+        return view("admin.projects.edit", compact("project", "type", "technologies"));
     }
 
     /**
@@ -140,8 +139,9 @@ class ProjectController extends Controller
             "cover_img" => "file",
             "github_link" => "string",
             "type_id" => "nullable|exists:types,id",
-            "technology_id "=>"nullable|exists:technologies,id"
-            ]);
+            "technology_id" => "array|nullable|exists:technologies,id"
+        ]);
+    
 
 
 
@@ -158,15 +158,19 @@ class ProjectController extends Controller
         }
         $project->update([
             ...$data,
-            "user_id" =>Auth::id(),
-            "cover_img"=>$path ?? $project->cover_img,
+            "user_id" => Auth::id(),
+            "cover_img" => $path ?? $project->cover_img,
 
-        ]);  
-        $project->technologies()->sync($data["technology_id"]); 
-
-
-        return redirect()->route("admin.projects.show",$id);
+        ]);
+        if(isNull($data["technology_id"])){
+            $project->technologies()->detach(); 
+        }else{
+            
+            $project->technologies()->sync($data["technology_id"]);
+        }
         
+
+        return redirect()->route("admin.projects.show", compact("id","project"));
     }
 
     /**
@@ -179,10 +183,10 @@ class ProjectController extends Controller
     {
         $project = Project::findOrFail($id);
 
-      /*   if ($project->cover_img) {
+        if ($project->cover_img) {
             Storage::delete($project->cover_img);
-        } */
-
+        }
+        $project->technologies()->detach();
         $project->delete();
         return redirect()->route("admin.projects.index");
     }

@@ -42,10 +42,24 @@
     </div>
 
     <select name="type_id" class="form-select mb-4">
-      @foreach ($types as $type)
+      @foreach ($type as $type)
       <option value="{{ $type->id }}">{{ $type->type }}</option>
       @endforeach
     </select>
+
+    <div class="">Technologies</div>
+      
+       @foreach ($technologies as $technology)
+       <div class="form-check form-check-inline @error('technology_id') is-invalid @enderror">
+        {{-- Il name dell'input ha come suffisso le quadre [] che indicheranno al server,
+              di creare un array con i vari tag che stiamo inviando --}}
+        <input class="form-check-input @error('technology_id') is-invalid @enderror" type="checkbox"
+          id="technologiesCheckbox_{{ $loop->index }}" value="{{ $technology->id or null}}" name="technology_id[]"
+          {{ in_array( $technology->id, old('technology_id', [])) ? 'checked' : '' }}
+          >
+        <label class="form-check-label" for="technologiesCheckbox_{{ $loop->index }}">{{ $technology->technology }}</label>
+      </div>
+       @endforeach
 
     
     
